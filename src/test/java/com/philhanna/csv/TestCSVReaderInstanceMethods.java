@@ -86,7 +86,6 @@ public class TestCSVReaderInstanceMethods extends BaseTest {
       final int expected = 3;
       final int actual = rs.getColumnCount();
       assertEquals(expected, actual);
-      rs.close();
    }
 
    @Test
@@ -96,7 +95,6 @@ public class TestCSVReaderInstanceMethods extends BaseTest {
       while (rs.next())
          actual++;
       assertEquals(expected, actual);
-      rs.close();
    }
 
    @Test

@@ -19,7 +19,7 @@ import com.philhanna.csv.CSVWriter;
 /**
  * Unit tests for CSV writer tests
  */
-public class TestCVSWriter extends BaseTest {
+public class TestCSVWriter extends BaseTest {
 
    // ==================================================================
    // Fixtures

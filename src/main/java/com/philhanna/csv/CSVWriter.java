@@ -169,30 +169,18 @@ public class CSVWriter {
 
    /**
     * Flushes the underlying output writer
+    * @throws IOException if an I/O error occurs
     */
-   public void flush() throws CSVException {
-      try {
-         out.flush();
-      }
-      catch (IOException e) {
-         final String errmsg = "Could not flush the "
-               + getClass().getSimpleName();
-         throw new CSVException(errmsg, e);
-      }
+   public void flush() throws IOException {
+      out.flush();
    }
 
    /**
     * Closes the CSV writer and the underlying output writer
+    * @throws IOException if an I/O error occurs
     */
-   public void close() throws CSVException {
-      try {
+   public void close() throws IOException {
          out.close();
-      }
-      catch (IOException e) {
-         final String errmsg = "Could not close the "
-               + getClass().getSimpleName();
-         throw new CSVException(errmsg, e);
-      }
    }
 
    /**

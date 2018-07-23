@@ -202,30 +202,26 @@ public class CSVReader {
    /**
     * Creates a new CSV reader for the specified input reader
     * @param reader an input reader
-    * @throws CSVException if a parsing or I/O error occurs
+    * @throws CSVException if a parsing error occurs
+    * @throws IOException if an I/O error occurs
     */
-   public CSVReader(Reader reader) throws CSVException {
+   public CSVReader(Reader reader) throws CSVException, IOException {
 
       this.in = new BufferedReader(reader, BUFFER_SIZE);
 
       // Read and store the column headings from the first row
 
-      try {
-         final String line = in.readLine();
-         if (line == null) {
-            final String errmsg = "No records were found in .csv file";
-            throw new CSVException(errmsg);
-         }
-         int columnIndex = 0;
-         for (final String columnName : parse(line)) {
-            columnIndex++;
-            columnNames.put(columnName, columnIndex);
-         }
-         this.columnCount = columnNames.size();
+      final String line = in.readLine();
+      if (line == null) {
+         final String errmsg = "No records were found in .csv file";
+         throw new CSVException(errmsg);
       }
-      catch (IOException e) {
-         throw new CSVException(e);
+      int columnIndex = 0;
+      for (final String columnName : parse(line)) {
+         columnIndex++;
+         columnNames.put(columnName, columnIndex);
       }
+      this.columnCount = columnNames.size();
    }
 
    /**
@@ -235,8 +231,9 @@ public class CSVReader {
     * @param inputStream an input stream over a .csv file
     * @throws FileNotFoundException if the file is not found
     * @throws CSVException if a parsing error occurs
+    * @throws IOException if an I/O error occurs
     */
-   public CSVReader(InputStream inputStream) throws CSVException {
+   public CSVReader(InputStream inputStream) throws CSVException, IOException {
       this(new InputStreamReader(inputStream));
    }
 
@@ -245,10 +242,10 @@ public class CSVReader {
     * convenience method that simply opens a FileReader and calls the
     * Reader constructor.
     * @param inputFile an input .csv file
-    * @throws FileNotFoundException if the file is not found
+    * @throws IOException if the file is not found or an I/O error occurs
     * @throws CSVException if a parsing error occurs
     */
-   public CSVReader(File inputFile) throws FileNotFoundException, CSVException {
+   public CSVReader(File inputFile) throws IOException, CSVException {
       this(new FileReader(inputFile));
    }
 
@@ -263,47 +260,42 @@ public class CSVReader {
     * called, it returns the first data row.
     * @return <code>true</code>, if there is a current row, or
     *         <code>false</code> if there are no more rows
-    * @throws CSVException if a parsing or I/O error occurs
+    * @throws CSVException if a parsing error occurs
+    * @throws IOException if an I/O error occurs
     */
-   public boolean next() throws CSVException {
+   public boolean next() throws CSVException, IOException {
 
       // Do not try to read from a closed reader
 
       if (eof)
          return false;
 
-      try {
+      // Read the next line. If there are no more lines, return false
 
-         // Read the next line. If there are no more lines, return false
-
-         final String line = in.readLine();
-         if (line == null) {
-            eof = true;
-            return false;
-         }
-
-         // Parse the line and verify that it has enough tokens
-
-         final List<String> tokens = parse(line);
-         if (tokens.size() < columnCount) {
-            final String errmsg = String.format(
-                  "Expected %d columns, found only %d",
-                  columnCount,
-                  tokens.size());
-            throw new CSVException(errmsg);
-         }
-
-         // Store its column values
-
-         this.values = tokens;
-
-         // Report success
-
-         return true;
+      final String line = in.readLine();
+      if (line == null) {
+         eof = true;
+         return false;
       }
-      catch (IOException e) {
-         throw new CSVException(e);
+
+      // Parse the line and verify that it has enough tokens
+
+      final List<String> tokens = parse(line);
+      if (tokens.size() < columnCount) {
+         final String errmsg = String.format(
+               "Expected %d columns, found only %d",
+               columnCount,
+               tokens.size());
+         throw new CSVException(errmsg);
       }
+
+      // Store its column values
+
+      this.values = tokens;
+
+      // Report success
+
+      return true;
    }
 
    /**
@@ -345,10 +337,12 @@ public class CSVReader {
             return columnName;
          }
       }
-      final String errmsg = String.format(""
-            + "BUG: %d is a valid column index,"
-            + " but there was no column name found there."
-            + "", columnIndex);
+      final String errmsg = String.format(
+            ""
+                  + "BUG: %d is a valid column index,"
+                  + " but there was no column name found there."
+                  + "",
+            columnIndex);
       throw new CSVException(errmsg);
    }
 
@@ -505,17 +499,11 @@ public class CSVReader {
 
    /**
     * Closes the CSV reader and the underlying input stream
+    * @throws IOException if unable to close stream
     */
-   public void close() throws CSVException {
+   public void close() throws IOException {
       this.eof = true;
-      try {
-         in.close();
-      }
-      catch (IOException e) {
-         final String errmsg = "Could not close the "
-               + getClass().getSimpleName();
-         throw new CSVException(errmsg, e);
-      }
+      in.close();
    }
 
    // ====================================================================

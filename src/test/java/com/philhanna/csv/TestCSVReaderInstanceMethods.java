@@ -151,6 +151,19 @@ public class TestCSVReaderInstanceMethods extends BaseTest {
    }
 
    @Test
+   public void handlesReadAfterEOF() throws Exception {
+      boolean eofWasFound = false;
+      for (int i = 0; i < 100; i++) {
+         final boolean rc = rs.next();
+         if (rc == false) {
+            eofWasFound = true;
+            break;
+         }
+      }
+      assertTrue(eofWasFound);
+   }
+
+   @Test
    public void getsIntegerByName() throws Exception {
       // Skip to 3rd row
       rs.next();

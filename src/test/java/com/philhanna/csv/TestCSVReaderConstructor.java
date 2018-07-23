@@ -1,6 +1,7 @@
 package com.philhanna.csv;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 
@@ -35,6 +36,14 @@ public class TestCSVReaderConstructor extends BaseTest {
       catch (CSVException e) {
          // This is the expected behavior
       }
+   }
+   
+   @Test
+   public void testFileConstructor() throws Exception {
+      final File cwd = new File(".");
+      final File testFile = new File(cwd, "src/test/resources/row_metadata.csv");
+      final CSVReader reader = new CSVReader(testFile);
+      assertNotNull(reader);
    }
 
 }

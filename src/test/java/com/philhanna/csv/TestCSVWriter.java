@@ -97,7 +97,7 @@ public class TestCSVWriter extends BaseTest {
       final CSVWriter ro = new CSVWriter(sw);
       final Object[] tokens = {
             "Dangers",
-            new Integer(3),
+            3,
             "Lions, Tigers, Bears", };
       ro.write(tokens);
       ro.flush();
